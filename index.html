@@ -1,55 +1,174 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TajSport Shop</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --tg-theme-bg-color: #fff;
+            --tg-theme-text-color: #000;
+            --tg-theme-button-color: #3390ec;
+            --tg-theme-button-text-color: #fff;
+            --secondary-bg: #f4f4f7;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--tg-theme-bg-color);
+            color: var(--tg-theme-text-color);
+            margin: 0;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .header {
+            text-align: center;
+            padding: 10px;
+        }
+        .header img {
+            max-width: 150px;
+            border-radius: 10px;
+        }
+        .category-title {
+            font-weight: bold;
+            font-size: 1.2em;
+            border-left: 4px solid var(--tg-theme-button-color);
+            padding-left: 10px;
+            margin-top: 10px;
+        }
+        .product-card {
+            background: var(--secondary-bg);
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .product-info b {
+            display: block;
+            font-size: 1.1em;
+        }
+        .product-info span {
+            color: #777;
+            font-size: 0.9em;
+        }
+        .price {
+            font-weight: bold;
+            color: var(--tg-theme-button-color);
+            margin-right: 10px;
+        }
+        button {
+            background-color: var(--tg-theme-button-color);
+            color: var(--tg-theme-button-text-color);
+            border: none;
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:active { transform: scale(0.95); }
+        .cart-status {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #333;
+            color: #fff;
+            padding: 10px 20px;
+            border-radius: 20px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
 <div class="header">
     <h2>🏟️ TAJ SPORT</h2>
     <p>Оптовый магазин спортивных товаров</p>
 </div>
 
-<div class="category-title">👟 Обувь для футбола</div>
+<div class="category-title">⚽ Футбольная экипировка</div>
 <div class="product-card">
     <div class="product-info">
-        <img src="https://tajsport.tj/upload/iblock/582/precision_blue.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Kelme Precision (Blue)</b>
-        <span>Профессиональные футзалки</span>
+        <b>Футбольная форма (комплект)</b>
+        <span>Разные клубы и сборные</span>
     </div>
     <div>
-        <span class="price">450 TJS</span>
-        <button onclick="addToCart('Kelme Precision', 450)">+</button>
-    </div>
-</div>
-
-<div class="category-title">⚽ Мячи и Аксессуары</div>
-<div class="product-card">
-    <div class="product-info">
-        <img src="https://tajsport.tj/upload/iblock/a2b/ball_ucl.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Adidas UCL Pro</b>
-        <span>Официальный мяч Лиги Чемпионов</span>
-    </div>
-    <div>
-        <span class="price">350 TJS</span>
-        <button onclick="addToCart('Мяч Adidas UCL', 350)">+</button>
+        <span class="price">150 TJS</span>
+        <button onclick="addToCart('Форма Футбольная', 150)">+</button>
     </div>
 </div>
 
 <div class="product-card">
     <div class="product-info">
-        <img src="https://tajsport.tj/upload/iblock/c1d/gloves_nike.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Перчатки Nike GK</b>
-        <span>Вратарские перчатки (Full Grip)</span>
+        <b>Мяч Nike Flight</b>
+        <span>Профессиональный снаряд</span>
     </div>
     <div>
         <span class="price">280 TJS</span>
-        <button onclick="addToCart('Перчатки Nike', 280)">+</button>
+        <button onclick="addToCart('Мяч Nike Flight', 280)">+</button>
     </div>
 </div>
 
-<div class="category-title">🎒 Экипировка</div>
+<div class="category-title">🥊 Бокс и Единоборства</div>
 <div class="product-card">
     <div class="product-info">
-        <img src="https://tajsport.tj/upload/iblock/e3f/bag_joma.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Сумка Joma Training</b>
-        <span>Вместительная сумка для формы</span>
+        <b>Перчатки Everlast (12oz)</b>
+        <span>Натуральная кожа</span>
     </div>
     <div>
-        <span class="price">220 TJS</span>
-        <button onclick="addToCart('Сумка Joma', 220)">+</button>
+        <span class="price">320 TJS</span>
+        <button onclick="addToCart('Перчатки Everlast', 320)">+</button>
     </div>
 </div>
+
+<div class="category-title">🏋️ Тренажеры и Инвентарь</div>
+<div class="product-card">
+    <div class="product-info">
+        <b>Гантели разборные (20кг)</b>
+        <span>Сталь, пара</span>
+    </div>
+    <div>
+        <span class="price">450 TJS</span>
+        <button onclick="addToCart('Гантели 20кг', 450)">+</button>
+    </div>
+</div>
+
+<div id="cartStatus" class="cart-status">Заказ оформлен!</div>
+
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.MainButton.text = "ОФОРМИТЬ ЗАКАЗ";
+    tg.MainButton.color = "#31b545";
+
+    let cart = [];
+    let totalPrice = 0;
+
+    function addToCart(name, price) {
+        cart.push(name);
+        totalPrice += price;
+        tg.MainButton.show();
+        tg.MainButton.setText(`КУПИТЬ (ИТОГО: ${totalPrice} TJS)`);
+    }
+
+    tg.onEvent('mainButtonClicked', function() {
+        let data = {
+            action: 'order_with_profile',
+            items: cart,
+            total: totalPrice,
+            client: {
+                company: 'Тестовый клиент',
+                city: 'Душанбе',
+                phone: 'Контакт через TG'
+            }
+        };
+        tg.sendData(JSON.stringify(data));
+        tg.close();
+    });
+</script>
+</body>
+</html>
