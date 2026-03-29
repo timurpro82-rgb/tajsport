@@ -1,37 +1,216 @@
-<div class="category-title">👟 Обувь для футбола</div>
-<div class="product-card">
-    <div class="product-info">
-        <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/582/precision_blue.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Kelme Precision (Blue)</b>
-        <span>Профессиональные футзалки</span>
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>TajSport Premium</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        /* Основные переменные из темы Telegram */
+        :root {
+            --bg-color: var(--tg-theme-bg-color, #fff);
+            --text-color: var(--tg-theme-text-color, #000);
+            --hint-color: var(--tg-theme-hint-color, #999);
+            --button-color: var(--tg-theme-button-color, #3390ec);
+            --button-text: var(--tg-theme-button-text-color, #fff);
+            --secondary-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 0 0 80px 0; /* Отступ снизу для кнопки */
+            overflow-x: hidden;
+        }
+
+        .header {
+            padding: 20px;
+            text-align: center;
+            background: var(--secondary-bg);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            margin-bottom: 20px;
+        }
+
+        .header h2 { margin: 0; font-size: 24px; color: var(--button-color); }
+        .header p { margin: 5px 0 0; color: var(--hint-color); font-size: 14px; }
+
+        .container { padding: 0 15px; }
+
+        .category-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 20px 0 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Сетка товаров */
+        .products-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .product-card {
+            background: var(--secondary-bg);
+            border-radius: 15px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease;
+            position: relative;
+        }
+
+        .product-card:active { transform: scale(0.97); }
+
+        .product-image {
+            width: 100%;
+            aspect-ratio: 1/1;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: #eee;
+        }
+
+        .product-name {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 5px;
+            height: 34px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .product-price {
+            font-size: 16px;
+            font-weight: bold;
+            color: var(--button-color);
+            margin-top: auto;
+        }
+
+        .add-btn {
+            margin-top: 10px;
+            background: var(--button-color);
+            color: var(--button-text);
+            border: none;
+            border-radius: 10px;
+            padding: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Бейдж количества в корзине */
+        .badge {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: #e74c3c;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="header">
+    <h2>🏟️ TAJ SPORT</h2>
+    <p>Элитная экипировка для чемпионов</p>
+</div>
+
+<div class="container">
+    <div class="category-title">👟 Профессиональная обувь</div>
+    <div class="products-grid">
+        <div class="product-card">
+            <span id="badge-1" class="badge">0</span>
+            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/582/precision_blue.jpg" class="product-image">
+            <div class="product-name">Kelme Precision Premium Blue</div>
+            <div class="product-price">450 TJS</div>
+            <button class="add-btn" onclick="addToCart(1, 'Kelme Precision', 450)">Добавить</button>
+        </div>
+        <div class="product-card">
+            <span id="badge-2" class="badge">0</span>
+            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/a2b/ball_ucl.jpg" class="product-image">
+            <div class="product-name">Мяч Adidas UCL Pro 2024</div>
+            <div class="product-price">350 TJS</div>
+            <button class="add-btn" onclick="addToCart(2, 'Мяч Adidas UCL', 350)">Добавить</button>
+        </div>
     </div>
-    <div>
-        <span class="price">450 TJS</span>
-        <button onclick="addToCart('Kelme Precision', 450)">+</button>
+
+    <div class="category-title">🥊 Аксессуары</div>
+    <div class="products-grid">
+        <div class="product-card">
+            <span id="badge-3" class="badge">0</span>
+            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/c1d/gloves_nike.jpg" class="product-image">
+            <div class="product-name">Перчатки Nike GK Vapor</div>
+            <div class="product-price">280 TJS</div>
+            <button class="add-btn" onclick="addToCart(3, 'Перчатки Nike', 280)">Добавить</button>
+        </div>
+        <div class="product-card">
+            <span id="badge-4" class="badge">0</span>
+            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/e3f/bag_joma.jpg" class="product-image">
+            <div class="product-name">Спортивная сумка Joma XL</div>
+            <div class="product-price">220 TJS</div>
+            <button class="add-btn" onclick="addToCart(4, 'Сумка Joma', 220)">Добавить</button>
+        </div>
     </div>
 </div>
 
-<div class="category-title">⚽ Мячи и Аксессуары</div>
-<div class="product-card">
-    <div class="product-info">
-        <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/a2b/ball_ucl.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Adidas UCL Pro</b>
-        <span>Официальный мяч Лиги Чемпионов</span>
-    </div>
-    <div>
-        <span class="price">350 TJS</span>
-        <button onclick="addToCart('Мяч Adidas UCL', 350)">+</button>
-    </div>
-</div>
+<script>
+    let tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.MainButton.text = "ПЕРЕЙТИ К ОПЛАТЕ";
+    tg.MainButton.color = "#31b545";
 
-<div class="product-card">
-    <div class="product-info">
-        <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/c1d/gloves_nike.jpg" width="100" style="border-radius: 8px; margin-bottom: 5px;">
-        <b>Перчатки Nike GK</b>
-        <span>Вратарские перчатки (Full Grip)</span>
-    </div>
-    <div>
-        <span class="price">280 TJS</span>
-        <button onclick="addToCart('Перчатки Nike', 280)">+</button> 
-    </div>
-</div>
+    let cart = {};
+    let totalPrice = 0;
+
+    function addToCart(id, name, price) {
+        if (!cart[id]) {
+            cart[id] = { name: name, price: price, count: 0 };
+        }
+        cart[id].count++;
+        totalPrice += price;
+
+        // Обновляем бейдж на карточке
+        let badge = document.getElementById(`badge-${id}`);
+        badge.innerText = cart[id].count;
+        badge.style.display = 'block';
+
+        tg.MainButton.show();
+        tg.MainButton.setText(`ОФОРМИТЬ ЗАКАЗ: ${totalPrice} TJS`);
+        
+        // Вибрация при добавлении
+        tg.HapticFeedback.impactOccurred('medium');
+    }
+
+    tg.onEvent('mainButtonClicked', function() {
+        let itemsList = [];
+        for (let id in cart) {
+            itemsList.push(`${cart[id].name} x${cart[id].count}`);
+        }
+
+        let data = {
+            action: 'order_with_profile',
+            items: itemsList,
+            total: totalPrice,
+            client: {
+                company: 'Оптовый покупатель',
+                phone: 'Через Telegram'
+            }
+        };
+        tg.sendData(JSON.stringify(data));
+        tg.close();
+    });
+</script>
+</body>
+</html>
