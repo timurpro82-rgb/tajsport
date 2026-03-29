@@ -5,100 +5,307 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>TajSport Premium</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: var(--tg-theme-bg-color, #ffffff);
-            --text-color: var(--tg-theme-text-color, #000000);
-            --hint-color: var(--tg-theme-hint-color, #999999);
-            --button-color: var(--tg-theme-button-color, #3390ec);
+            --bg-color: var(--tg-theme-bg-color, #0e0e0e);
+            --text-color: var(--tg-theme-text-color, #f0f0f0);
+            --hint-color: var(--tg-theme-hint-color, #888888);
+            --button-color: var(--tg-theme-button-color, #e63946);
             --button-text: var(--tg-theme-button-text-color, #ffffff);
-            --sec-bg: var(--tg-theme-secondary-bg-color, #f4f4f7);
+            --sec-bg: var(--tg-theme-secondary-bg-color, #1a1a1a);
+            --card-bg: #1e1e1e;
+            --accent: #e63946;
+            --gold: #f4a261;
         }
 
+        * { box-sizing: border-box; }
+
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0 0 100px 0;
+            padding: 0 0 120px 0;
+            overflow-x: hidden;
         }
 
+        /* HEADER */
         .header {
-            padding: 25px 20px;
+            padding: 30px 20px 20px;
             text-align: center;
-            background: var(--sec-bg);
-            border-radius: 0 0 25px 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            background: linear-gradient(160deg, #1a1a1a 0%, #111 100%);
+            border-bottom: 2px solid var(--accent);
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: 'TAJ';
+            position: absolute;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 120px;
+            color: rgba(230,57,70,0.05);
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .header h2 {
+            margin: 0;
+            font-family: 'Bebas Neue', cursive;
+            font-size: 36px;
+            letter-spacing: 3px;
+            color: var(--accent);
+        }
+        .header p {
+            margin: 6px 0 0;
+            color: var(--hint-color);
+            font-size: 13px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
-        .header h2 { margin: 0; color: var(--button-color); font-size: 26px; }
-        .header p { margin: 5px 0 0; color: var(--hint-color); font-size: 14px; }
+        /* SEARCH */
+        .search-bar {
+            margin: 0 15px 20px;
+            position: relative;
+        }
+        .search-bar input {
+            width: 100%;
+            padding: 12px 18px 12px 42px;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 14px;
+            color: var(--text-color);
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .search-bar input:focus { border-color: var(--accent); }
+        .search-bar input::placeholder { color: var(--hint-color); }
+        .search-bar .icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 16px;
+            opacity: 0.5;
+        }
+
+        /* TABS */
+        .tabs {
+            display: flex;
+            gap: 8px;
+            padding: 0 15px 20px;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .tabs::-webkit-scrollbar { display: none; }
+        .tab {
+            white-space: nowrap;
+            padding: 8px 16px;
+            background: var(--card-bg);
+            border: 1px solid #333;
+            border-radius: 20px;
+            color: var(--hint-color);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .tab.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
 
         .container { padding: 0 15px; }
 
+        /* CATEGORY */
+        .category-section { margin-bottom: 30px; }
         .category-title {
-            font-size: 18px;
-            font-weight: 700;
-            margin: 25px 0 15px;
-            padding-left: 10px;
-            border-left: 4px solid var(--button-color);
+            font-family: 'Bebas Neue', cursive;
+            font-size: 22px;
+            letter-spacing: 2px;
+            margin: 0 0 15px;
+            padding: 10px 14px;
+            background: var(--card-bg);
+            border-left: 4px solid var(--accent);
+            border-radius: 0 10px 10px 0;
+            color: var(--text-color);
         }
 
+        /* GRID */
         .grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
+        /* CARD */
         .card {
-            background: var(--sec-bg);
-            border-radius: 18px;
+            background: var(--card-bg);
+            border-radius: 16px;
             padding: 12px;
             display: flex;
             flex-direction: column;
-            transition: transform 0.1s ease;
             position: relative;
+            border: 1px solid #2a2a2a;
+            transition: transform 0.15s ease, border-color 0.2s;
+            overflow: hidden;
         }
-
         .card:active { transform: scale(0.96); }
+        .card.in-cart { border-color: var(--accent); }
 
-        .card img {
+        .card-img-wrap {
             width: 100%;
             aspect-ratio: 1/1;
-            object-fit: cover;
-            border-radius: 12px;
+            border-radius: 10px;
+            overflow: hidden;
             margin-bottom: 10px;
-            background: #fff;
+            background: #2a2a2a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+        }
+        .card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
-        .name { font-size: 14px; font-weight: 600; height: 38px; overflow: hidden; margin-bottom: 8px; }
-        .price { font-size: 17px; font-weight: 800; color: var(--button-color); }
+        .card-label {
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            background: var(--gold);
+            color: #000;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .name {
+            font-size: 13px;
+            font-weight: 600;
+            line-height: 1.3;
+            min-height: 34px;
+            margin-bottom: 6px;
+            color: var(--text-color);
+        }
+        .price {
+            font-family: 'Bebas Neue', cursive;
+            font-size: 22px;
+            letter-spacing: 1px;
+            color: var(--accent);
+            margin-bottom: 2px;
+        }
+        .price-old {
+            font-size: 11px;
+            color: var(--hint-color);
+            text-decoration: line-through;
+            margin-bottom: 8px;
+        }
+
+        .qty-control {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .qty-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: #2a2a2a;
+            color: var(--text-color);
+            font-size: 18px;
+            font-weight: 700;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.15s;
+            flex-shrink: 0;
+        }
+        .qty-btn:active { background: var(--accent); }
+        .qty-num {
+            font-weight: 800;
+            font-size: 16px;
+            min-width: 20px;
+            text-align: center;
+        }
 
         .add-btn {
-            margin-top: 12px;
-            background: var(--button-color);
-            color: var(--button-text);
+            margin-top: 10px;
+            background: var(--accent);
+            color: white;
             border: none;
             border-radius: 10px;
             padding: 10px;
             font-weight: 700;
+            font-size: 13px;
             cursor: pointer;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            transition: opacity 0.15s;
+        }
+        .add-btn:active { opacity: 0.8; }
+
+        /* CART SUMMARY */
+        .cart-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, #111 80%, transparent);
+            padding: 20px 15px 30px;
+            display: none;
+            z-index: 100;
+        }
+        .cart-bar.visible { display: block; }
+        .cart-btn {
+            width: 100%;
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            font-size: 16px;
+            font-weight: 800;
+            font-family: 'Bebas Neue', cursive;
+            letter-spacing: 1.5px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .cart-btn .cart-count {
+            background: rgba(255,255,255,0.25);
+            border-radius: 8px;
+            padding: 2px 10px;
+            font-size: 14px;
         }
 
-        .badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #e74c3c;
-            color: white;
-            padding: 3px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: bold;
+        /* EMPTY STATE */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--hint-color);
+            font-size: 14px;
             display: none;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
         }
+        .empty.visible { display: block; }
+        .empty-icon { font-size: 48px; margin-bottom: 10px; }
     </style>
 </head>
 <body>
@@ -108,74 +315,192 @@
     <p>Элитная экипировка для чемпионов</p>
 </div>
 
-<div class="container">
-    <div class="category-title">👟 Футбольная обувь</div>
-    <div class="grid">
-        <div class="card">
-            <span id="badge-1" class="badge">0</span>
-            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/582/precision_blue.jpg">
-            <div class="name">Kelme Precision Blue</div>
-            <div class="price">450 TJS</div>
-            <button class="add-btn" onclick="addToCart(1, 'Kelme Precision', 450)">В корзину</button>
-        </div>
-        <div class="card">
-            <span id="badge-2" class="badge">0</span>
-            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/a2b/ball_ucl.jpg">
-            <div class="name">Adidas UCL Pro 2024</div>
-            <div class="price">350 TJS</div>
-            <button class="add-btn" onclick="addToCart(2, 'Мяч Adidas UCL', 350)">В корзину</button>
-        </div>
-    </div>
+<div class="search-bar">
+    <span class="icon">🔍</span>
+    <input type="text" placeholder="Поиск товаров..." oninput="filterProducts(this.value)" />
+</div>
 
-    <div class="category-title">🥊 Снаряжение</div>
-    <div class="grid">
-        <div class="card">
-            <span id="badge-3" class="badge">0</span>
-            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/c1d/gloves_nike.jpg">
-            <div class="name">Перчатки Nike GK</div>
-            <div class="price">280 TJS</div>
-            <button class="add-btn" onclick="addToCart(3, 'Перчатки Nike', 280)">В корзину</button>
-        </div>
-        <div class="card">
-            <span id="badge-4" class="badge">0</span>
-            <img src="https://images.weserv.nl/?url=tajsport.tj/upload/iblock/e3f/bag_joma.jpg">
-            <div class="name">Сумка Joma Training</div>
-            <div class="price">220 TJS</div>
-            <button class="add-btn" onclick="addToCart(4, 'Сумка Joma', 220)">В корзину</button>
-        </div>
-    </div>
+<div class="tabs" id="tabs">
+    <div class="tab active" onclick="filterCategory('all', this)">🔥 Все</div>
+    <div class="tab" onclick="filterCategory('boots', this)">👟 Бутсы</div>
+    <div class="tab" onclick="filterCategory('balls', this)">⚽ Мячи</div>
+    <div class="tab" onclick="filterCategory('gloves', this)">🥊 Перчатки</div>
+    <div class="tab" onclick="filterCategory('bags', this)">🎒 Сумки</div>
+    <div class="tab" onclick="filterCategory('clothing', this)">👕 Одежда</div>
+    <div class="tab" onclick="filterCategory('accessories', this)">🧢 Аксессуары</div>
+</div>
+
+<div class="container" id="productContainer"></div>
+<div class="empty" id="emptyState">
+    <div class="empty-icon">🔎</div>
+    Товары не найдены
+</div>
+
+<div class="cart-bar" id="cartBar">
+    <button class="cart-btn" onclick="checkout()">
+        <span>🛒 ОФОРМИТЬ ЗАКАЗ</span>
+        <span id="cartTotal">0 TJS</span>
+        <span class="cart-count" id="cartCount">0</span>
+    </button>
 </div>
 
 <script>
     let tg = window.Telegram.WebApp;
     tg.expand();
-    
-    let cart = {};
-    let total = 0;
+
+    // --- ДАННЫЕ ТОВАРОВ ---
+    const products = [
+        // БУТСЫ
+        { id: 1, cat: 'boots', emoji: '👟', name: 'Kelme Precision Blue FG', price: 450, oldPrice: 520, label: 'Хит' },
+        { id: 2, cat: 'boots', emoji: '⚡', name: 'Nike Mercurial Vapor 15', price: 890, oldPrice: null, label: null },
+        { id: 3, cat: 'boots', emoji: '🔥', name: 'Adidas Predator Edge.1', price: 750, oldPrice: 900, label: 'Скидка' },
+        { id: 4, cat: 'boots', emoji: '🥇', name: 'Puma Future 7 Pro FG', price: 620, oldPrice: null, label: null },
+        // МЯЧИ
+        { id: 5, cat: 'balls', emoji: '⚽', name: 'Adidas UCL Pro 2024', price: 350, oldPrice: 420, label: 'Хит' },
+        { id: 6, cat: 'balls', emoji: '🏆', name: 'Nike Flight Premier League', price: 280, oldPrice: null, label: null },
+        { id: 7, cat: 'balls', emoji: '⚽', name: 'Select Brillant Super', price: 220, oldPrice: 260, label: 'Скидка' },
+        // ПЕРЧАТКИ
+        { id: 8, cat: 'gloves', emoji: '🥊', name: 'Nike GK Mercurial Touch', price: 280, oldPrice: null, label: null },
+        { id: 9, cat: 'gloves', emoji: '🧤', name: 'Adidas Predator Pro', price: 320, oldPrice: 380, label: 'Скидка' },
+        { id: 10, cat: 'gloves', emoji: '🥊', name: 'Uhlsport Supergrip+ FS', price: 260, oldPrice: null, label: null },
+        // СУМКИ
+        { id: 11, cat: 'bags', emoji: '🎒', name: 'Joma Training Bag Pro', price: 220, oldPrice: null, label: null },
+        { id: 12, cat: 'bags', emoji: '💼', name: 'Nike Academy Team Bag', price: 190, oldPrice: 240, label: 'Скидка' },
+        { id: 13, cat: 'bags', emoji: '🎒', name: 'Adidas Tiro Backpack', price: 170, oldPrice: null, label: null },
+        // ОДЕЖДА
+        { id: 14, cat: 'clothing', emoji: '👕', name: 'Форма Kelme Liga', price: 380, oldPrice: null, label: 'Новинка' },
+        { id: 15, cat: 'clothing', emoji: '🩳', name: 'Nike Dri-FIT Academy', price: 150, oldPrice: null, label: null },
+        { id: 16, cat: 'clothing', emoji: '🧣', name: 'Adidas Tiro 23 Tracksuit', price: 490, oldPrice: 580, label: 'Скидка' },
+        // АКСЕССУАРЫ
+        { id: 17, cat: 'accessories', emoji: '🧢', name: 'Nike Heritage86 Cap', price: 120, oldPrice: null, label: null },
+        { id: 18, cat: 'accessories', emoji: '🦵', name: 'Щитки Nike Charge 2.0', price: 95, oldPrice: 120, label: 'Скидка' },
+    ];
+
+    let cart = {}; // { id: count }
+    let activeCategory = 'all';
+    let searchQuery = '';
+
+    // --- РЕНДЕР ---
+    function renderProducts() {
+        const container = document.getElementById('productContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        const filtered = products.filter(p => {
+            const catMatch = activeCategory === 'all' || p.cat === activeCategory;
+            const searchMatch = p.name.toLowerCase().includes(searchQuery.toLowerCase());
+            return catMatch && searchMatch;
+        });
+
+        if (filtered.length === 0) {
+            container.innerHTML = '';
+            emptyState.classList.add('visible');
+            return;
+        }
+        emptyState.classList.remove('visible');
+
+        // Группировка по категориям
+        const catNames = { boots: '👟 Бутсы', balls: '⚽ Мячи', gloves: '🥊 Перчатки', bags: '🎒 Сумки', clothing: '👕 Одежда', accessories: '🧢 Аксессуары' };
+        const groups = {};
+        filtered.forEach(p => {
+            if (!groups[p.cat]) groups[p.cat] = [];
+            groups[p.cat].push(p);
+        });
+
+        let html = '';
+        Object.entries(groups).forEach(([cat, items]) => {
+            html += `<div class="category-section">`;
+            if (activeCategory === 'all') html += `<div class="category-title">${catNames[cat] || cat}</div>`;
+            html += `<div class="grid">`;
+            items.forEach(p => {
+                const inCart = cart[p.id] > 0;
+                html += `
+                <div class="card ${inCart ? 'in-cart' : ''}" id="card-${p.id}">
+                    ${p.label ? `<div class="card-label">${p.label}</div>` : ''}
+                    <div class="card-img-wrap">${p.emoji}</div>
+                    <div class="name">${p.name}</div>
+                    <div class="price">${p.price} TJS</div>
+                    ${p.oldPrice ? `<div class="price-old">${p.oldPrice} TJS</div>` : '<div style="height:16px"></div>'}
+                    ${inCart ? `
+                        <div class="qty-control">
+                            <button class="qty-btn" onclick="changeQty(${p.id}, -1, ${p.price})">−</button>
+                            <span class="qty-num" id="qty-${p.id}">${cart[p.id]}</span>
+                            <button class="qty-btn" onclick="changeQty(${p.id}, 1, ${p.price})">+</button>
+                        </div>
+                    ` : `
+                        <button class="add-btn" onclick="addToCart(${p.id}, '${p.name}', ${p.price})">В корзину</button>
+                    `}
+                </div>`;
+            });
+            html += `</div></div>`;
+        });
+        container.innerHTML = html;
+    }
 
     function addToCart(id, name, price) {
-        if (!cart[id]) cart[id] = { name: name, price: price, count: 0 };
-        cart[id].count++;
-        total += price;
-
-        let badge = document.getElementById(`badge-${id}`);
-        badge.innerText = cart[id].count;
-        badge.style.display = 'block';
-
-        tg.MainButton.setText(`ОФОРМИТЬ ЗАКАЗ: ${total} TJS`);
-        tg.MainButton.show();
+        cart[id] = 1;
+        updateCartBar();
+        renderProducts();
         tg.HapticFeedback.impactOccurred('medium');
     }
 
-    tg.onEvent('mainButtonClicked', function() {
-        let items = Object.values(cart).map(i => `${i.name} x${i.count}`);
+    function changeQty(id, delta, price) {
+        cart[id] = (cart[id] || 0) + delta;
+        if (cart[id] <= 0) delete cart[id];
+        updateCartBar();
+        renderProducts();
+        tg.HapticFeedback.impactOccurred('light');
+    }
+
+    function updateCartBar() {
+        const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
+        const totalPrice = Object.entries(cart).reduce((sum, [id, count]) => {
+            const p = products.find(x => x.id == id);
+            return sum + (p ? p.price * count : 0);
+        }, 0);
+
+        const bar = document.getElementById('cartBar');
+        document.getElementById('cartTotal').textContent = `${totalPrice} TJS`;
+        document.getElementById('cartCount').textContent = totalItems;
+
+        if (totalItems > 0) {
+            bar.classList.add('visible');
+        } else {
+            bar.classList.remove('visible');
+        }
+    }
+
+    function filterCategory(cat, el) {
+        activeCategory = cat;
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        renderProducts();
+    }
+
+    function filterProducts(query) {
+        searchQuery = query;
+        renderProducts();
+    }
+
+    function checkout() {
+        const items = Object.entries(cart).map(([id, count]) => {
+            const p = products.find(x => x.id == id);
+            return `${p.name} x${count}`;
+        });
+        const total = Object.entries(cart).reduce((sum, [id, count]) => {
+            const p = products.find(x => x.id == id);
+            return sum + (p ? p.price * count : 0);
+        }, 0);
+
         tg.sendData(JSON.stringify({
             action: 'order_with_profile',
             items: items,
             total: total
         }));
         tg.close();
-    });
+    }
+
+    // Инициализация
+    renderProducts();
 </script>
 </body>
 </html>
