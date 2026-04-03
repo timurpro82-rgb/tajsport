@@ -77,6 +77,8 @@ async def admin_users(message: types.Message):
 async def get_web_app_data(message: types.Message):
     tg_user = message.from_user
     username = f"@{tg_user.username}" if tg_user.username else "скрыт"
+    
+    logging.info(f"📦 ПОЛУЧЕН ЗАКАЗ от {tg_user.id}: {message.web_app_data.data}")
 
     # ОТЛАДКА — покажет что именно пришло от магазина
     logging.info(f"RAW DATA: {message.web_app_data.data}")
