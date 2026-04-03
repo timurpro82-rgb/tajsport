@@ -78,6 +78,9 @@ async def get_web_app_data(message: types.Message):
     tg_user = message.from_user
     username = f"@{tg_user.username}" if tg_user.username else "скрыт"
 
+    # ОТЛАДКА — покажет что именно пришло от магазина
+    logging.info(f"RAW DATA: {message.web_app_data.data}")
+
     # 1. Парсим JSON
     try:
         data = json.loads(message.web_app_data.data)
