@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TajSport Premium</title>
+    <title>TajSport Wholesale</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
@@ -12,6 +12,7 @@
             --text-color: #f0f0f0;
             --accent: #e63946;
             --card-bg: #1a1a1a;
+            --error: #ff4d4d;
         }
 
         body {
@@ -20,7 +21,7 @@
             color: var(--text-color);
             margin: 0;
             padding: 0;
-            padding-bottom: 100px;
+            padding-bottom: 120px;
         }
 
         header {
@@ -30,54 +31,62 @@
             border-bottom: 2px solid var(--accent);
         }
 
-        h1 { margin: 0; font-size: 24px; color: var(--accent); }
-
         .container {
             padding: 15px;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            gap: 12px;
         }
 
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 15px;
-            text-align: center;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
             border: 1px solid #333;
         }
 
-        .product-emoji { font-size: 40px; margin-bottom: 10px; }
-        .product-name { font-weight: 600; font-size: 14px; margin-bottom: 5px; height: 35px; overflow: hidden; }
-        .product-price { color: var(--accent); font-weight: 800; margin-bottom: 10px; }
+        .product-emoji { font-size: 32px; margin-bottom: 8px; text-align: center; }
+        .product-name { font-weight: 600; font-size: 13px; height: 32px; overflow: hidden; margin-bottom: 4px; }
+        .product-price { color: var(--accent); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+        .product-min { font-size: 10px; color: #888; margin-bottom: 10px; }
 
-        .btn-add {
+        .counter {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #222;
+            border-radius: 6px;
+            padding: 4px;
+        }
+
+        .counter button {
             background: var(--accent);
             color: white;
             border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            width: 100%;
-            font-weight: 600;
-            cursor: pointer;
+            width: 25px;
+            height: 25px;
+            border-radius: 4px;
+            font-weight: bold;
         }
 
-        /* Плашка корзины внизу */
+        .counter span { font-weight: 600; width: 30px; text-align: center; }
+
+        /* Бар корзины */
         .cart-bar {
             position: fixed;
             bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
+            left: 5%;
             width: 90%;
             background: #222;
             padding: 15px;
-            border-radius: 15px;
-            display: none; /* Скрыта по умолчанию */
+            border-radius: 12px;
+            display: none;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
             border: 1px solid var(--accent);
-            z-index: 1000;
         }
 
         .cart-bar.visible { display: flex; }
@@ -86,7 +95,7 @@
             background: #27ae60;
             color: white;
             border: none;
-            padding: 10px 20px;
+            padding: 10px 15px;
             border-radius: 8px;
             font-weight: 800;
             cursor: pointer;
@@ -96,96 +105,134 @@
 <body>
 
 <header>
-    <h1>TAJ SPORT</h1>
-    <p style="font-size: 12px; opacity: 0.7;">Оптовый магазин спортивных товаров</p>
+    <h1 style="margin:0; color:var(--accent); font-size: 22px;">TAJ SPORT OPTOM</h1>
+    <div style="font-size: 10px; opacity: 0.6;">Минимум: Крупное 5шт / Мелочь 10шт</div>
 </header>
 
-<div class="container" id="products">
-    </div>
+<div class="container" id="products-list"></div>
 
 <div class="cart-bar" id="cartBar">
     <div>
-        <div style="font-size: 12px; opacity: 0.6;">Итого:</div>
-        <div id="cartTotal" style="font-weight: 800; font-size: 18px; color: #fff;">0 TJS</div>
+        <div id="cartTotal" style="font-weight: 800; font-size: 18px;">0 TJS</div>
+        <div id="cartStatus" style="font-size: 10px; color: #888;">Проверка лимитов...</div>
     </div>
-    <button class="btn-checkout" onclick="checkout()">ОФОРМИТЬ ЗАКАЗ</button>
+    <button class="btn-checkout" onclick="checkout()">ОФОРМИТЬ</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Развернуть на весь экран
+    tg.expand();
 
+    // Категории: boots, clothing (5шт), balls, gloves, bags, accessories (10шт)
     const products = [
-        { id: 1, name: "Футбольный мяч Nike", price: 250, emoji: "⚽" },
-        { id: 2, name: "Бутсы Adidas Predator", price: 850, emoji: "👟" },
-        { id: 3, name: "Перчатки вратарские", price: 180, emoji: "🧤" },
-        { id: 4, name: "Спортивная сумка", price: 320, emoji: "👜" },
-        { id: 5, name: "Набор гантелей 10кг", price: 450, emoji: "🏋️" },
-        { id: 6, name: "Скакалка скоростная", price: 45, emoji: "🪢" }
+        { id: 1, name: "Бутсы Nike Mercurial", price: 850, cat: 'boots', emoji: "👟" },
+        { id: 2, name: "Футбольный мяч Nike", price: 250, cat: 'balls', emoji: "⚽" },
+        { id: 3, name: "Вратарские перчатки", price: 180, cat: 'gloves', emoji: "🧤" },
+        { id: 4, name: "Форма сб. Таджикистана", price: 150, cat: 'clothing', emoji: "👕" },
+        { id: 5, name: "Спортивная сумка", price: 300, cat: 'bags', emoji: "👜" },
+        { id: 6, name: "Гетры игровые", price: 35, cat: 'accessories', emoji: "🧦" },
+        { id: 7, name: "Шиповки Adidas", price: 750, cat: 'boots', emoji: "👟" },
+        { id: 8, name: "Костюм тренировочный", price: 450, cat: 'clothing', emoji: "🧥" }
     ];
 
     let cart = {};
 
-    function renderProducts() {
-        const container = document.getElementById('products');
-        container.innerHTML = products.map(p => `
-            <div class="product-card">
-                <div class="product-emoji">${p.emoji}</div>
-                <div class="product-name">${p.name}</div>
-                <div class="product-price">${p.price} TJS</div>
-                <button class="btn-add" onclick="addToCart(${p.id})">Добавить</button>
-            </div>
-        `).join('');
+    function render() {
+        const container = document.getElementById('products-list');
+        container.innerHTML = products.map(p => {
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            const count = cart[p.id] || 0;
+            return `
+                <div class="product-card">
+                    <div class="product-emoji">${p.emoji}</div>
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${p.price} TJS</div>
+                    <div class="product-min">Мин. заказ: ${min} шт.</div>
+                    <div class="counter">
+                        <button onclick="change(${p.id}, -1)">-</button>
+                        <span>${count}</span>
+                        <button onclick="change(${p.id}, 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
     }
 
-    function addToCart(id) {
-        cart[id] = (cart[id] || 0) + 1;
+    function change(id, delta) {
+        const current = cart[id] || 0;
+        const next = current + delta;
+        if (next <= 0) delete cart[id];
+        else cart[id] = next;
         updateCart();
+        render();
     }
 
     function updateCart() {
         let total = 0;
         let count = 0;
+        let errors = [];
+
         for (const id in cart) {
-            const product = products.find(p => p.id == id);
-            total += product.price * cart[id];
+            const p = products.find(x => x.id == id);
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            if (cart[id] < min) {
+                errors.push(p.name);
+            }
+            total += p.price * cart[id];
             count += cart[id];
         }
 
         const bar = document.getElementById('cartBar');
-        document.getElementById('cartTotal').textContent = total + " TJS";
-        
+        const status = document.getElementById('cartStatus');
+        const totalEl = document.getElementById('cartTotal');
+
         if (count > 0) {
             bar.classList.add('visible');
+            totalEl.textContent = total + " TJS";
+            if (errors.length > 0) {
+                status.textContent = "⚠️ Есть товары ниже лимита";
+                status.style.color = "#ff4d4d";
+            } else {
+                status.textContent = "✅ Лимиты соблюдены";
+                status.style.color = "#27ae60";
+            }
+        } else {
+            bar.classList.remove('visible');
         }
     }
 
     function checkout() {
         const orderItems = [];
         let totalAmount = 0;
+        let errors = [];
 
         for (const id in cart) {
-            const product = products.find(p => p.id == id);
-            orderItems.push(`${product.name} (x${cart[id]})`);
-            totalAmount += product.price * cart[id];
+            const p = products.find(x => x.id == id);
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            
+            if (cart[id] < min) {
+                errors.push(`${p.name}: минимум ${min}шт (у вас ${cart[id]})`);
+            }
+            
+            orderItems.push(`${p.name} x${cart[id]}`);
+            totalAmount += p.price * cart[id];
         }
 
-        if (orderItems.length === 0) return;
+        if (errors.length > 0) {
+            alert("НЕЛЬЗЯ ОФОРМИТЬ:\n\n" + errors.join('\n'));
+            tg.HapticFeedback.notificationOccurred('error');
+            return;
+        }
 
-        // Формируем объект данных
-        const data = {
+        tg.sendData(JSON.stringify({
             action: 'order_with_profile',
             items: orderItems,
             total: totalAmount
-        };
-
-        // ОТПРАВКА В ТЕЛЕГРАМ БОТ
-        // Эта функция закроет Mini App и отправит сообщение боту
-        tg.sendData(JSON.stringify(data));
+        }));
+        tg.close();
     }
 
-    renderProducts();
+    render();
 </script>
-
 </body>
 </html>
