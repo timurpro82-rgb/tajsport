@@ -12,7 +12,6 @@
             --text-color: #f0f0f0;
             --accent: #e63946;
             --card-bg: #1a1a1a;
-            --error: #ff4d4d;
         }
 
         body {
@@ -20,19 +19,18 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 0;
             padding-bottom: 120px;
         }
 
         header {
-            padding: 20px;
+            padding: 15px;
             text-align: center;
             background: var(--card-bg);
             border-bottom: 2px solid var(--accent);
         }
 
         .container {
-            padding: 15px;
+            padding: 12px;
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
@@ -41,16 +39,33 @@
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
-            padding: 12px;
+            padding: 10px;
             display: flex;
             flex-direction: column;
             border: 1px solid #333;
+            position: relative;
         }
 
-        .product-emoji { font-size: 32px; margin-bottom: 8px; text-align: center; }
-        .product-name { font-weight: 600; font-size: 13px; height: 32px; overflow: hidden; margin-bottom: 4px; }
-        .product-price { color: var(--accent); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
-        .product-min { font-size: 10px; color: #888; margin-bottom: 10px; }
+        .product-img {
+            width: 100%;
+            height: 120px;
+            object-fit: contain;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 8px;
+        }
+
+        .product-name { 
+            font-weight: 600; 
+            font-size: 12px; 
+            height: 34px; 
+            overflow: hidden; 
+            margin-bottom: 4px;
+            line-height: 1.2;
+        }
+
+        .product-price { color: var(--accent); font-weight: 800; font-size: 15px; margin-bottom: 4px; }
+        .product-min { font-size: 9px; color: #888; margin-bottom: 8px; }
 
         .counter {
             display: flex;
@@ -58,22 +73,20 @@
             justify-content: space-between;
             background: #222;
             border-radius: 6px;
-            padding: 4px;
+            padding: 3px;
         }
 
         .counter button {
             background: var(--accent);
             color: white;
             border: none;
-            width: 25px;
-            height: 25px;
-            border-radius: 4px;
+            width: 28px;
+            height: 28px;
+            border-radius: 5px;
             font-weight: bold;
+            font-size: 18px;
         }
 
-        .counter span { font-weight: 600; width: 30px; text-align: center; }
-
-        /* Бар корзины */
         .cart-bar {
             position: fixed;
             bottom: 20px;
@@ -81,12 +94,12 @@
             width: 90%;
             background: #222;
             padding: 15px;
-            border-radius: 12px;
+            border-radius: 15px;
             display: none;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
             border: 1px solid var(--accent);
+            z-index: 1000;
         }
 
         .cart-bar.visible { display: flex; }
@@ -95,18 +108,16 @@
             background: #27ae60;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
+            padding: 12px 20px;
+            border-radius: 10px;
             font-weight: 800;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
 <header>
-    <h1 style="margin:0; color:var(--accent); font-size: 22px;">TAJ SPORT OPTOM</h1>
-    <div style="font-size: 10px; opacity: 0.6;">Минимум: Крупное 5шт / Мелочь 10шт</div>
+    <h1 style="margin:0; color:var(--accent); font-size: 20px;">TAJ SPORT OPTOM</h1>
 </header>
 
 <div class="container" id="products-list"></div>
@@ -114,7 +125,7 @@
 <div class="cart-bar" id="cartBar">
     <div>
         <div id="cartTotal" style="font-weight: 800; font-size: 18px;">0 TJS</div>
-        <div id="cartStatus" style="font-size: 10px; color: #888;">Проверка лимитов...</div>
+        <div id="cartStatus" style="font-size: 10px;">Проверка...</div>
     </div>
     <button class="btn-checkout" onclick="checkout()">ОФОРМИТЬ</button>
 </div>
@@ -123,16 +134,50 @@
     const tg = window.Telegram.WebApp;
     tg.expand();
 
-    // Категории: boots, clothing (5шт), balls, gloves, bags, accessories (10шт)
+    // ТОВАРЫ С ССЫЛКАМИ НА ФОТО С TAJSPORT.TJ
     const products = [
-        { id: 1, name: "Бутсы Nike Mercurial", price: 850, cat: 'boots', emoji: "👟" },
-        { id: 2, name: "Футбольный мяч Nike", price: 250, cat: 'balls', emoji: "⚽" },
-        { id: 3, name: "Вратарские перчатки", price: 180, cat: 'gloves', emoji: "🧤" },
-        { id: 4, name: "Форма сб. Таджикистана", price: 150, cat: 'clothing', emoji: "👕" },
-        { id: 5, name: "Спортивная сумка", price: 300, cat: 'bags', emoji: "👜" },
-        { id: 6, name: "Гетры игровые", price: 35, cat: 'accessories', emoji: "🧦" },
-        { id: 7, name: "Шиповки Adidas", price: 750, cat: 'boots', emoji: "👟" },
-        { id: 8, name: "Костюм тренировочный", price: 450, cat: 'clothing', emoji: "🧥" }
+        { 
+            id: 101, 
+            name: "Футзалки Nike Mercurial", 
+            price: 450, 
+            cat: 'boots', 
+            img: "https://tajsport.tj/image/cache/catalog/1111/mercurial-white-700x700.jpg" 
+        },
+        { 
+            id: 102, 
+            name: "Мяч Select Brilliant Super", 
+            price: 550, 
+            cat: 'balls', 
+            img: "https://tajsport.tj/image/cache/catalog/ мячи/select-brillant-700x700.jpg" 
+        },
+        { 
+            id: 103, 
+            name: "Перчатки Uhlsport Soft", 
+            price: 320, 
+            cat: 'gloves', 
+            img: "https://tajsport.tj/image/cache/catalog/перчатки/uhlsport-soft-700x700.jpg" 
+        },
+        { 
+            id: 104, 
+            name: "Форма Реал Мадрид 24/25", 
+            price: 180, 
+            cat: 'clothing', 
+            img: "https://tajsport.tj/image/cache/catalog/форма/real-25-700x700.jpg" 
+        },
+        { 
+            id: 105, 
+            name: "Сумка Joma Training", 
+            price: 280, 
+            cat: 'bags', 
+            img: "https://tajsport.tj/image/cache/catalog/сумки/joma-bag-700x700.jpg" 
+        },
+        { 
+            id: 106, 
+            name: "Щитки Nike Mercurial", 
+            price: 95, 
+            cat: 'accessories', 
+            img: "https://tajsport.tj/image/cache/catalog/щитки/nike-lite-700x700.jpg" 
+        }
     ];
 
     let cart = {};
@@ -144,10 +189,10 @@
             const count = cart[p.id] || 0;
             return `
                 <div class="product-card">
-                    <div class="product-emoji">${p.emoji}</div>
+                    <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/150?text=TajSport'">
                     <div class="product-name">${p.name}</div>
                     <div class="product-price">${p.price} TJS</div>
-                    <div class="product-min">Мин. заказ: ${min} шт.</div>
+                    <div class="product-min">Опт от ${min} шт.</div>
                     <div class="counter">
                         <button onclick="change(${p.id}, -1)">-</button>
                         <span>${count}</span>
@@ -175,25 +220,22 @@
         for (const id in cart) {
             const p = products.find(x => x.id == id);
             const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
-            if (cart[id] < min) {
-                errors.push(p.name);
-            }
+            if (cart[id] < min) errors.push(p.name);
             total += p.price * cart[id];
             count += cart[id];
         }
 
         const bar = document.getElementById('cartBar');
         const status = document.getElementById('cartStatus');
-        const totalEl = document.getElementById('cartTotal');
+        document.getElementById('cartTotal').textContent = total + " TJS";
 
         if (count > 0) {
             bar.classList.add('visible');
-            totalEl.textContent = total + " TJS";
             if (errors.length > 0) {
-                status.textContent = "⚠️ Есть товары ниже лимита";
+                status.textContent = "⚠️ Минимум не набран";
                 status.style.color = "#ff4d4d";
             } else {
-                status.textContent = "✅ Лимиты соблюдены";
+                status.textContent = "✅ Лимиты ОК";
                 status.style.color = "#27ae60";
             }
         } else {
@@ -209,18 +251,13 @@
         for (const id in cart) {
             const p = products.find(x => x.id == id);
             const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
-            
-            if (cart[id] < min) {
-                errors.push(`${p.name}: минимум ${min}шт (у вас ${cart[id]})`);
-            }
-            
+            if (cart[id] < min) errors.push(`${p.name} (нужно ${min}шт)`);
             orderItems.push(`${p.name} x${cart[id]}`);
             totalAmount += p.price * cart[id];
         }
 
         if (errors.length > 0) {
-            alert("НЕЛЬЗЯ ОФОРМИТЬ:\n\n" + errors.join('\n'));
-            tg.HapticFeedback.notificationOccurred('error');
+            alert("Ошибка:\n" + errors.join('\n'));
             return;
         }
 
