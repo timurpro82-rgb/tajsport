@@ -9,117 +9,77 @@ from aiogram.filters import Command
 from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
 
-# --- 1. НАСТРОЙКИ ---
+# --- НАСТРОЙКИ ---
 load_dotenv()
-API_TOKEN = os.getenv("BOT_TOKEN")
-# Твой ID из .env или напрямую, если .env не подгрузится
-ADMIN_ID = int(os.getenv("ADMIN_ID") or 984166339)
+API_TOKEN = "8499675270:AAH4Bv-KJMRCn0JHoBRYqG0h3g5JW80JvbI"
+# ТВОЙ ID: Я прописал его вручную, чтобы точно дошло
+ADMIN_ID = 984166339 
 WEB_APP_URL = "https://timurpro82-rgb.github.io/tajsport/index.html"
 
-# Настройка логирования
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(levelname)s - %(message)s'
-)
-
-if not API_TOKEN:
-    logging.error("❌ ОШИБКА: BOT_TOKEN не найден!")
-    sys.exit(1)
-
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# --- 2. ОБРАБОТЧИКИ ---
-
-# Команда /start
 @dp.message(Command("start"))
-async def send_welcome(message: types.Message):
-    # Создаем кнопку Reply Keyboard (внизу экрана)
-    # Это ОБЯЗАТЕЛЬНО для передачи данных через tg.sendData
+async def start_cmd(message: types.Message):
     markup = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="🏟️ Магазин TajSport (ОПТ)", web_app=WebAppInfo(url=WEB_APP_URL))]
-        ],
+        keyboard=[[KeyboardButton(text="🏟️ Магазин TajSport (ОПТ)", web_app=WebAppInfo(url=WEB_APP_URL))]],
         resize_keyboard=True
     )
-    
     await message.answer(
-        f"Салом, {html.escape(message.from_user.first_name)}! 👋\n\n"
-        "Вы вошли в оптовый чат-бот <b>TAJ SPORT</b>.\n"
-        "Нажмите на кнопку ниже, пройдите быструю регистрацию и выбирайте товары по оптовым ценам.",
-        reply_markup=markup,
-        parse_mode="HTML"
+        f"Салом, {html.escape(message.from_user.first_name)}! 👋\nЗайдите в магазин для заказа:",
+        reply_markup=markup
     )
 
-# Обработка данных из Mini App (Регистрация + Заказ)
 @dp.message(F.content_type == types.ContentType.WEB_APP_DATA)
-async def get_web_app_data(message: types.Message):
-    raw_json = message.web_app_data.data
-    logging.info(f"📦 ПОЛУЧЕНЫ ДАННЫЕ: {raw_json}")
+async def handle_order(message: types.Message):
+    raw_data = message.web_app_data.data
+    print(f"--- ПОЛУЧЕН ЗАКАЗ: {raw_data} ---") # Увидишь это в PyCharm
     
     try:
-        data = json.loads(raw_json)
+        data = json.loads(raw_data)
         
-        # Данные клиента из формы регистрации
+        # Безопасно достаем данные клиента
         client = data.get('client', {})
-        name = client.get('name', 'Не указано')
-        phone = client.get('phone', 'Не указано')
-        city = client.get('city', 'Не указано')
+        c_name = client.get('name', 'Не указано')
+        c_phone = client.get('phone', 'Не указано')
+        c_city = client.get('city', 'Не указано')
         
-        # Данные заказа
-        items_list = data.get('items', [])
+        items = data.get('items', [])
         total = data.get('total', 0)
-        items_text = "\n".join([f"🔹 {item}" for item in items_list])
+        items_text = "\n".join([f"🔹 {i}" for i in items]) if items else "Товары не указаны"
 
-        # Формируем красивый отчет для АДМИНИСТРАТОРА (тебя)
-        admin_report = (
-            f"⚡️ <b>НОВЫЙ ОПТОВЫЙ ЗАКАЗ</b>\n"
+        # Текст для ТЕБЯ
+        report = (
+            f"🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n"
             f"━━━━━━━━━━━━━\n"
-            f"👤 <b>Клиент:</b> {html.escape(name)}\n"
-            f"📞 <b>Телефон:</b> <code>{html.escape(phone)}</code>\n"
-            f"📍 <b>Город:</b> {html.escape(city)}\n"
+            f"👤 <b>ФИО:</b> {html.escape(str(c_name))}\n"
+            f"📞 <b>Тел:</b> <code>{html.escape(str(c_phone))}</code>\n"
+            f"📍 <b>Город:</b> {html.escape(str(c_city))}\n"
             f"━━━━━━━━━━━━━\n"
             f"📦 <b>ТОВАРЫ:</b>\n{items_text}\n"
             f"━━━━━━━━━━━━━\n"
             f"💰 <b>ИТОГО: {total} TJS</b>\n"
-            f"👤 <b>Аккаунт:</b> @{message.from_user.username or 'скрыт'}"
+            f"🔗 Аккаунт: @{message.from_user.username or 'нет'}"
         )
 
-        # 1. Отправляем отчет админу
-        await bot.send_message(ADMIN_ID, admin_report, parse_mode="HTML")
+        # ОТПРАВКА АДМИНУ
+        await bot.send_message(ADMIN_ID, report, parse_mode="HTML")
         
-        # 2. Подтверждаем пользователю
-        await message.answer(
-            "✅ <b>Заказ и данные приняты!</b>\n\n"
-            "Наш менеджер проверит наличие товара и свяжется с вами по указанному номеру телефона. Спасибо!",
-            parse_mode="HTML"
-        )
-        logging.info(f"✅ Заказ клиента {name} отправлен админу.")
+        # Ответ пользователю
+        await message.answer("✅ <b>Ваш заказ отправлен менеджеру!</b>\nМы свяжемся с вами.", parse_mode="HTML")
 
     except Exception as e:
-        logging.error(f"❌ Ошибка парсинга данных: {e}")
-        await message.answer("⚠️ Произошла ошибка при обработке данных. Попробуйте еще раз.")
+        logging.error(f"Ошибка: {e}")
+        # Если произошла ошибка, всё равно отправим "сырые" данные админу, чтобы заказ не потерялся
+        await bot.send_message(ADMIN_ID, f"⚠️ Ошибка в заказе, но данные получены:\n<pre>{raw_data}</pre>", parse_mode="HTML")
 
-# --- 3. ЗАПУСК БОТА ---
 async def main():
-    logging.info("🚀 ЗАПУСК БОТА TAJSPORT...")
-    
-    # Удаляем вебхуки и старые сообщения
+    print(f"🚀 БОТ ЗАПУЩЕН! Админ: {ADMIN_ID}")
     await bot.delete_webhook(drop_pending_updates=True)
-    
-    # Запуск опроса серверов Telegram
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
-    # Настройка для стабильной работы на Windows
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    
-    try:
-        asyncio.run(main())
-    except (KeyboardInterrupt, SystemExit):
-<<<<<<< HEAD
-        logging.info("👋 Бот остановлен.")
-=======
-        logging.info("👋 Бот остановлен.")
->>>>>>> b83409b718801734142077564bf52ed88d93f6f5
+    asyncio.run(main())
