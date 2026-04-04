@@ -9,65 +9,113 @@ from aiogram.filters import Command
 from aiogram.types import WebAppInfo, ReplyKeyboardMarkup, KeyboardButton
 from dotenv import load_dotenv
 
-# --- НАСТРОЙКИ ---
+# --- 1. НАСТРОЙКИ ---
 load_dotenv()
-API_TOKEN = "8499675270:AAH4Bv-KJMRCn0JHoBRYqG0h3g5JW80JvbI"
-ADMIN_ID = 984166339 
+API_TOKEN = os.getenv("BOT_TOKEN")
+# Твой ID из .env или напрямую, если .env не подгрузится
+ADMIN_ID = int(os.getenv("ADMIN_ID") or 984166339)
 WEB_APP_URL = "https://timurpro82-rgb.github.io/tajsport/index.html"
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+# Настройка логирования
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+
+if not API_TOKEN:
+    logging.error("❌ ОШИБКА: BOT_TOKEN не найден!")
+    sys.exit(1)
+
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher()
 
-# --- ОБРАБОТЧИКИ ---
+# --- 2. ОБРАБОТЧИКИ ---
 
+# Команда /start
 @dp.message(Command("start"))
-async def start_cmd(message: types.Message):
-    # ГЛАВНОЕ: Эта кнопка появится ВНИЗУ экрана. Только через неё придет заказ!
+async def send_welcome(message: types.Message):
+    # Создаем кнопку Reply Keyboard (внизу экрана)
+    # Это ОБЯЗАТЕЛЬНО для передачи данных через tg.sendData
     markup = ReplyKeyboardMarkup(
         keyboard=[
-            [KeyboardButton(text="🏟️ Открыть Магазин TajSport", web_app=WebAppInfo(url=WEB_APP_URL))]
+            [KeyboardButton(text="🏟️ Магазин TajSport (ОПТ)", web_app=WebAppInfo(url=WEB_APP_URL))]
         ],
         resize_keyboard=True
     )
+    
     await message.answer(
-        f"Салом, {html.escape(message.from_user.first_name)}! 👋\n"
-        "Нажмите на кнопку ниже, чтобы сделать заказ:",
-        reply_markup=markup
+        f"Салом, {html.escape(message.from_user.first_name)}! 👋\n\n"
+        "Вы вошли в оптовый чат-бот <b>TAJ SPORT</b>.\n"
+        "Нажмите на кнопку ниже, пройдите быструю регистрацию и выбирайте товары по оптовым ценам.",
+        reply_markup=markup,
+        parse_mode="HTML"
     )
 
+# Обработка данных из Mini App (Регистрация + Заказ)
 @dp.message(F.content_type == types.ContentType.WEB_APP_DATA)
-async def handle_order(message: types.Message):
-    # Ловим данные от магазина
-    raw_data = message.web_app_data.data
-    logging.info(f"📦 ДАННЫЕ ПОЛУЧЕНЫ: {raw_data}")
+async def get_web_app_data(message: types.Message):
+    raw_json = message.web_app_data.data
+    logging.info(f"📦 ПОЛУЧЕНЫ ДАННЫЕ: {raw_json}")
     
     try:
-        data = json.loads(raw_data)
-        items = "\n".join([f"🔹 {i}" for i in data.get('items', [])])
+        data = json.loads(raw_json)
+        
+        # Данные клиента из формы регистрации
+        client = data.get('client', {})
+        name = client.get('name', 'Не указано')
+        phone = client.get('phone', 'Не указано')
+        city = client.get('city', 'Не указано')
+        
+        # Данные заказа
+        items_list = data.get('items', [])
         total = data.get('total', 0)
+        items_text = "\n".join([f"🔹 {item}" for item in items_list])
 
-        report = (
-            f"🛍 <b>НОВЫЙ ЗАКАЗ!</b>\n"
-            f"👤 Клиент: {html.escape(message.from_user.full_name)}\n"
-            f"📦 Товары:\n{items}\n"
-            f"💰 Итого: <b>{total} TJS</b>"
+        # Формируем красивый отчет для АДМИНИСТРАТОРА (тебя)
+        admin_report = (
+            f"⚡️ <b>НОВЫЙ ОПТОВЫЙ ЗАКАЗ</b>\n"
+            f"━━━━━━━━━━━━━\n"
+            f"👤 <b>Клиент:</b> {html.escape(name)}\n"
+            f"📞 <b>Телефон:</b> <code>{html.escape(phone)}</code>\n"
+            f"📍 <b>Город:</b> {html.escape(city)}\n"
+            f"━━━━━━━━━━━━━\n"
+            f"📦 <b>ТОВАРЫ:</b>\n{items_text}\n"
+            f"━━━━━━━━━━━━━\n"
+            f"💰 <b>ИТОГО: {total} TJS</b>\n"
+            f"👤 <b>Аккаунт:</b> @{message.from_user.username or 'скрыт'}"
         )
 
-        # Отправляем тебе
-        await bot.send_message(ADMIN_ID, report, parse_mode="HTML")
-        # Отвечаем клиенту
-        await message.answer("✅ Спасибо! Ваш заказ отправлен менеджеру.")
+        # 1. Отправляем отчет админу
+        await bot.send_message(ADMIN_ID, admin_report, parse_mode="HTML")
         
-    except Exception as e:
-        logging.error(f"Ошибка: {e}")
+        # 2. Подтверждаем пользователю
+        await message.answer(
+            "✅ <b>Заказ и данные приняты!</b>\n\n"
+            "Наш менеджер проверит наличие товара и свяжется с вами по указанному номеру телефона. Спасибо!",
+            parse_mode="HTML"
+        )
+        logging.info(f"✅ Заказ клиента {name} отправлен админу.")
 
+    except Exception as e:
+        logging.error(f"❌ Ошибка парсинга данных: {e}")
+        await message.answer("⚠️ Произошла ошибка при обработке данных. Попробуйте еще раз.")
+
+# --- 3. ЗАПУСК БОТА ---
 async def main():
-    print(f"🚀 БОТ ЗАПУЩЕН! Админ ID: {ADMIN_ID}")
+    logging.info("🚀 ЗАПУСК БОТА TAJSPORT...")
+    
+    # Удаляем вебхуки и старые сообщения
     await bot.delete_webhook(drop_pending_updates=True)
+    
+    # Запуск опроса серверов Telegram
     await dp.start_polling(bot)
 
 if __name__ == '__main__':
+    # Настройка для стабильной работы на Windows
     if sys.platform == 'win32':
         asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
-    asyncio.run(main())
+    
+    try:
+        asyncio.run(main())
+    except (KeyboardInterrupt, SystemExit):
+        logging.info("👋 Бот остановлен.")
