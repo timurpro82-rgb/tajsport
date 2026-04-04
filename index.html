@@ -3,189 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>TajSport Premium</title>
+    <title>TajSport Wholesale</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-color: #0e0e0e;
-            --text-color: #f0f0f0;
+            --bg: #0e0e0e;
+            --card: #1a1a1a;
             --accent: #e63946;
-            --card-bg: #1a1a1a;
+            --text: #f0f0f0;
+            --green: #27ae60;
         }
 
         body {
             font-family: 'Inter', sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background: var(--bg);
+            color: var(--text);
             margin: 0;
             padding: 0;
-            padding-bottom: 100px;
+            overflow-x: hidden;
         }
 
+        /* --- ЭКРАН РЕГИСТРАЦИИ --- */
+        #auth-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 2000; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;
+        }
+        .reg-card {
+            background: var(--card); padding: 25px; border-radius: 20px; width: 100%;
+            border: 1px solid var(--accent); box-shadow: 0 10px 40px rgba(230, 57, 70, 0.2);
+            max-width: 400px;
+        }
+        .reg-card h2 { margin: 0 0 10px 0; color: var(--accent); text-align: center; }
+        .reg-card p { font-size: 13px; opacity: 0.7; text-align: center; margin-bottom: 20px; }
+        
+        input {
+            width: 100%; padding: 14px; margin: 8px 0; border-radius: 10px;
+            border: 1px solid #333; background: #222; color: white; outline: none;
+            box-sizing: border-box; font-size: 16px;
+        }
+        .btn-reg {
+            width: 100%; padding: 16px; background: var(--accent); border: none;
+            color: white; font-weight: 800; border-radius: 10px; margin-top: 15px;
+            cursor: pointer; font-size: 16px;
+        }
+
+        /* --- МАГАЗИН --- */
+        #shop-screen { display: none; padding-bottom: 120px; }
+        
         header {
-            padding: 20px;
-            text-align: center;
-            background: var(--card-bg);
-            border-bottom: 2px solid var(--accent);
+            padding: 20px; text-align: center; background: var(--card);
+            border-bottom: 2px solid var(--accent); position: sticky; top: 0; z-index: 100;
         }
-
-        h1 { margin: 0; font-size: 24px; color: var(--accent); }
 
         .container {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 15px;
+            padding: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
         }
 
         .product-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            border: 1px solid #333;
+            background: var(--card); border-radius: 12px; padding: 10px;
+            display: flex; flex-direction: column; border: 1px solid #333;
         }
 
-        .product-emoji { font-size: 40px; margin-bottom: 10px; }
-        .product-name { font-weight: 600; font-size: 14px; margin-bottom: 5px; height: 35px; overflow: hidden; }
-        .product-price { color: var(--accent); font-weight: 800; margin-bottom: 10px; }
-
-        .btn-add {
-            background: var(--accent);
-            color: white;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            width: 100%;
-            font-weight: 600;
-            cursor: pointer;
+        .product-img {
+            width: 100%; height: 130px; object-fit: contain;
+            background: white; border-radius: 8px; margin-bottom: 8px;
         }
 
-        /* Плашка корзины внизу */
+        .product-name { 
+            font-weight: 600; font-size: 13px; height: 34px; 
+            overflow: hidden; margin-bottom: 4px; line-height: 1.2;
+        }
+
+        .product-price { color: var(--accent); font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+        .product-min { font-size: 10px; color: #888; margin-bottom: 10px; font-weight: 600; }
+
+        .counter {
+            display: flex; align-items: center; justify-content: space-between;
+            background: #222; border-radius: 8px; padding: 4px;
+        }
+        .counter button {
+            background: var(--accent); color: white; border: none;
+            width: 30px; height: 30px; border-radius: 6px; font-weight: bold; font-size: 18px;
+        }
+        .counter span { font-weight: 800; font-size: 16px; }
+
+        /* --- КОРЗИНА --- */
         .cart-bar {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            background: #222;
-            padding: 15px;
-            border-radius: 15px;
-            display: none; /* Скрыта по умолчанию */
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.5);
-            border: 1px solid var(--accent);
-            z-index: 1000;
+            position: fixed; bottom: 20px; left: 5%; width: 90%;
+            background: #222; padding: 15px; border-radius: 18px;
+            display: none; justify-content: space-between; align-items: center;
+            border: 1px solid var(--accent); box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+            z-index: 1000; box-sizing: border-box;
         }
-
         .cart-bar.visible { display: flex; }
-
         .btn-checkout {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: 800;
-            cursor: pointer;
+            background: var(--green); color: white; border: none;
+            padding: 12px 20px; border-radius: 10px; font-weight: 800; font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-<header>
-    <h1>TAJ SPORT</h1>
-    <p style="font-size: 12px; opacity: 0.7;">Оптовый магазин спортивных товаров</p>
-</header>
-
-<div class="container" id="products">
+<div id="auth-screen">
+    <div class="reg-card">
+        <h2>TAJ SPORT</h2>
+        <p>Для доступа к оптовым заказам, пожалуйста, представьтесь.</p>
+        <input type="text" id="reg-name" placeholder="Ваше Имя (ФИО)">
+        <input type="tel" id="reg-phone" placeholder="Номер телефона">
+        <input type="text" id="reg-city" placeholder="Город / Район">
+        <button class="btn-reg" onclick="register()">ВОЙТИ В МАГАЗИН</button>
     </div>
+</div>
+
+<div id="shop-screen">
+    <header>
+        <h1 style="margin:0; color:var(--accent); font-size: 24px;">TAJ SPORT OPTOM</h1>
+        <div id="user-info" style="font-size: 11px; opacity: 0.6; margin-top: 5px;"></div>
+    </header>
+
+    <div class="container" id="products-list"></div>
+</div>
 
 <div class="cart-bar" id="cartBar">
     <div>
-        <div style="font-size: 12px; opacity: 0.6;">Итого:</div>
-        <div id="cartTotal" style="font-weight: 800; font-size: 18px; color: #fff;">0 TJS</div>
+        <div id="cartTotal" style="font-weight: 800; font-size: 20px;">0 TJS</div>
+        <div id="cartStatus" style="font-size: 10px;">Проверка лимитов...</div>
     </div>
-    <button class="btn-checkout" onclick="checkout()">ОФОРМИТЬ ЗАКАЗ</button>
+    <button class="btn-checkout" onclick="checkout()">ОФОРМИТЬ</button>
 </div>
 
 <script>
     const tg = window.Telegram.WebApp;
-    tg.expand(); // Развернуть на весь экран
+    tg.expand();
 
-    const products = [
-        { id: 1, name: "Футбольный мяч Nike", price: 250, emoji: "⚽" },
-        { id: 2, name: "Бутсы Adidas Predator", price: 850, emoji: "👟" },
-        { id: 3, name: "Перчатки вратарские", price: 180, emoji: "🧤" },
-        { id: 4, name: "Спортивная сумка", price: 320, emoji: "👜" },
-        { id: 5, name: "Набор гантелей 10кг", price: 450, emoji: "🏋️" },
-        { id: 6, name: "Скакалка скоростная", price: 45, emoji: "🪢" }
-    ];
-
+    let userDetails = null;
     let cart = {};
 
-    function renderProducts() {
-        const container = document.getElementById('products');
-        container.innerHTML = products.map(p => `
-            <div class="product-card">
-                <div class="product-emoji">${p.emoji}</div>
-                <div class="product-name">${p.name}</div>
-                <div class="product-price">${p.price} TJS</div>
-                <button class="btn-add" onclick="addToCart(${p.id})">Добавить</button>
-            </div>
-        `).join('');
+    // КАТЕГОРИИ: boots/clothing (от 5), остальные (от 10)
+    const products = [
+        { id: 1, name: "Футзалки Nike Mercurial", price: 450, cat: 'boots', img: "https://tajsport.tj/image/cache/catalog/1111/mercurial-white-700x700.jpg" },
+        { id: 2, name: "Мяч Select Brilliant Super", price: 550, cat: 'balls', img: "https://tajsport.tj/image/cache/catalog/ мячи/select-brillant-700x700.jpg" },
+        { id: 3, name: "Перчатки Uhlsport Soft", price: 320, cat: 'gloves', img: "https://tajsport.tj/image/cache/catalog/перчатки/uhlsport-soft-700x700.jpg" },
+        { id: 4, name: "Форма Реал Мадрид 24/25", price: 180, cat: 'clothing', img: "https://tajsport.tj/image/cache/catalog/форма/real-25-700x700.jpg" },
+        { id: 5, name: "Сумка Joma Training", price: 280, cat: 'bags', img: "https://tajsport.tj/image/cache/catalog/сумки/joma-bag-700x700.jpg" },
+        { id: 6, name: "Щитки Nike Mercurial", price: 95, cat: 'accessories', img: "https://tajsport.tj/image/cache/catalog/щитки/nike-lite-700x700.jpg" }
+    ];
+
+    function register() {
+        const name = document.getElementById('reg-name').value;
+        const phone = document.getElementById('reg-phone').value;
+        const city = document.getElementById('reg-city').value;
+
+        if (name.length < 2 || phone.length < 5 || city.length < 2) {
+            alert("Заполните все поля регистрации!");
+            return;
+        }
+
+        userDetails = { name, phone, city };
+        document.getElementById('auth-screen').style.display = 'none';
+        document.getElementById('shop-screen').style.display = 'block';
+        document.getElementById('user-info').textContent = `Клиент: ${name} | ${city}`;
+        render();
     }
 
-    function addToCart(id) {
-        cart[id] = (cart[id] || 0) + 1;
+    function render() {
+        const container = document.getElementById('products-list');
+        container.innerHTML = products.map(p => {
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            const count = cart[p.id] || 0;
+            return `
+                <div class="product-card">
+                    <img src="${p.img}" class="product-img" onerror="this.src='https://via.placeholder.com/150?text=TajSport'">
+                    <div class="product-name">${p.name}</div>
+                    <div class="product-price">${p.price} TJS</div>
+                    <div class="product-min">Опт от ${min} шт.</div>
+                    <div class="counter">
+                        <button onclick="change(${p.id}, -1)">-</button>
+                        <span>${count}</span>
+                        <button onclick="change(${p.id}, 1)">+</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    function change(id, delta) {
+        const current = cart[id] || 0;
+        const next = current + delta;
+        if (next <= 0) delete cart[id];
+        else cart[id] = next;
         updateCart();
+        render();
     }
 
     function updateCart() {
         let total = 0;
         let count = 0;
+        let errors = false;
+
         for (const id in cart) {
-            const product = products.find(p => p.id == id);
-            total += product.price * cart[id];
+            const p = products.find(x => x.id == id);
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            if (cart[id] < min) errors = true;
+            total += p.price * cart[id];
             count += cart[id];
         }
 
         const bar = document.getElementById('cartBar');
+        const status = document.getElementById('cartStatus');
         document.getElementById('cartTotal').textContent = total + " TJS";
-        
+
         if (count > 0) {
             bar.classList.add('visible');
+            if (errors) {
+                status.textContent = "⚠️ Минимум не набран";
+                status.style.color = "#ff4d4d";
+            } else {
+                status.textContent = "✅ Лимиты соблюдены";
+                status.style.color = "#27ae60";
+            }
+        } else {
+            bar.classList.remove('visible');
         }
     }
 
     function checkout() {
         const orderItems = [];
         let totalAmount = 0;
+        let errors = [];
 
         for (const id in cart) {
-            const product = products.find(p => p.id == id);
-            orderItems.push(`${product.name} (x${cart[id]})`);
-            totalAmount += product.price * cart[id];
+            const p = products.find(x => x.id == id);
+            const min = (p.cat === 'boots' || p.cat === 'clothing') ? 5 : 10;
+            
+            if (cart[id] < min) {
+                errors.push(`${p.name}: нужно минимум ${min}шт`);
+            }
+            orderItems.push(`${p.name} x${cart[id]}`);
+            totalAmount += p.price * cart[id];
         }
 
-        if (orderItems.length === 0) return;
+        if (errors.length > 0) {
+            alert("Ошибка оптового заказа:\n\n" + errors.join('\n'));
+            tg.HapticFeedback.notificationOccurred('error');
+            return;
+        }
 
-        // Формируем объект данных
-        const data = {
-            action: 'order_with_profile',
+        const finalData = {
+            client: userDetails,
             items: orderItems,
             total: totalAmount
         };
 
-        // ОТПРАВКА В ТЕЛЕГРАМ БОТ
-        // Эта функция закроет Mini App и отправит сообщение боту
-        tg.sendData(JSON.stringify(data));
+        tg.sendData(JSON.stringify(finalData));
+        tg.close();
     }
-
-    renderProducts();
 </script>
-
 </body>
 </html>
